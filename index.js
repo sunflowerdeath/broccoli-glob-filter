@@ -6,10 +6,12 @@ var Q = require('q')
 var quickTemp = require('quick-temp')
 var dirmatch = require('dirmatch')
 var mkdirp = require('mkdirp')
-var copyDereferenceSync = require('copy-dereference').sync
+var symlinkOrCopySync = require('symlink-or-copy').sync
 
 var Filter = function(inputTree, options) {
-	if (options.files === undefined) options.files = ['**']
+	if (!options) options = {}
+	if (!options.files) options.files = ['**']
+	if (!options.encoding) options.encoding = 'utf-8'
 	this.inputTree = inputTree
 	this.options = options
 	this.cache = {}
@@ -20,7 +22,7 @@ var Filter = function(inputTree, options) {
 Filter.prototype.read = function(readTree) {
 	quickTemp.makeOrRemake(this, 'destDir')
 	var _this = this
-	readTree(this.inputTree, function(srcDir) {
+	return readTree(this.inputTree).then(function(srcDir) {
 		var files = dirmatch(srcDir, _this.options.files)
 		var results = _.map(files, function(file) {
 			return _this.processFile(file, srcDir)
@@ -41,15 +43,13 @@ Filter.prototype.processFile = function(relPath, srcDir) {
 	if (cacheEntry && cacheEntry.hash === hash) {
 		promise = Q(cacheEntry)
 	} else {
-		var content = fs.readFileSync(absPath)
+		var content = fs.readFileSync(absPath, this.options.encoding)
 		var process = this.processFileContent(content, relPath, srcDir)
 		var promise = Q.when(process).then(function(result) {
-			_this.saveToCache(result, relPath, hash)
+			return _this.saveToCache(result, relPath, hash)
 		})
 	}
-	return promise.then(function(cacheEntry) {
-		this.copyFromCache(cacheEntry)
-	})
+	return promise.then(this.copyFromCache.bind(this))
 }
 
 //Saves result of `processFileContent` to `cacheDir`.
@@ -64,12 +64,12 @@ Filter.prototype.saveToCache = function(result, file, hash) {
 	}
 	_.each(result, function(file) {
 		var dest = path.join(this.cacheDir, file.path)
-		mkdirp(path.dirname(dest))
-		fs.writeFileSync(dest, result)
+		mkdirp.sync(path.dirname(dest))
+		fs.writeFileSync(dest, file.content, this.options.encoding)
 	}, this)
 	var cacheEntry = {
 		hash: hash,
-		outputFiles: _.keys(result)
+		outputFiles: _.pluck(result, 'path')
 	}
 	this.cache[file] = cacheEntry
 	return cacheEntry
@@ -77,7 +77,11 @@ Filter.prototype.saveToCache = function(result, file, hash) {
 
 //Path of file is original path with extension from `options.targetExtension`
 Filter.prototype.getDestFilePath = function(file) {
-	//TODO
+	if (this.options.targetExtension) {
+		var basename = path.basename(file, path.extname(file)) + '.' +
+			this.options.targetExtension
+		file = path.join(path.dirname(file), basename)
+	}
 	return file
 }
 
@@ -86,18 +90,18 @@ Filter.prototype.hashFile = function(file) {
 	return String(stats.mtime.getTime()) + String(stats.size)
 }
 
-//Copies files from cacheDir to destDir.
+//Copies files from `cacheDir` to `destDir`.
 Filter.prototype.copyFromCache = function(cacheEntry) {
 	_.each(cacheEntry.outputFiles, function(file) {
-		var src = path.join(this.cacheDir, file.path)
-		var dest = path.join(this.destDir, file.path)
-		mkdirp(path.dirname(dest))
-		copyDereferenceSync(src, dest)
+		var src = path.join(this.cacheDir, file)
+		var dest = path.join(this.destDir, file)
+		mkdirp.sync(path.dirname(dest))
+		symlinkOrCopySync(src, dest)
 	}, this)
 }
 
 Filter.prototype.processFileContent = function(/* content, file, srcDir */) {
-	return new Error('You must implement method "processFileContent"')
+	throw new Error('You must implement method "processFileContent"')
 }
 
 Filter.prototype.cleanup = function() {

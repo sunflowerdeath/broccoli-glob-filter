@@ -40,6 +40,8 @@ MyFilter.processFileContent = function(content, relPath, srcDir) {
 
 ###Filter(inputTree, options)
 
+Constructor.
+
 ####inputTree
 
 Type: `Tree`
@@ -66,15 +68,16 @@ New extension for filtered files.
 
 ###Filter.processFileContent(content, relPath, srcDir)
 
-This method must be implemented in the inherited class.
+Returns: `string|array<object>`
 
-This method processes content of each file from the `inputTree` that matches patterns
-and returns content of new file.
+This method must be implemented in the inherited class.
+It processes content of each file from the `inputTree` that matches patterns
+and returns content of the new file.
 
 If you need to create more than one file, or to set special path of a file,
 you can return an array of file objects with the following properties:
-* `path` - relative path of new file
-* `content` - content of new file
+* `path` &ndash; relative path of the new file.
+* `content` &ndash; content of the new file.
 
 If you want to process a file asynchronously, you can return a promise.
 
@@ -94,7 +97,7 @@ Relative path of source file.
 
 Type: `string`
 
-Path of inputTree.
+Path of the `inputTree`.
 You can use it, when you need to read additional files from tree.
 
 ##License
