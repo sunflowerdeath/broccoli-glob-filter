@@ -25,8 +25,8 @@ MyFilter.prototype = Object.create(Filter.prototype)
 MyFilter.processFileContent = function(content, relPath, srcDir) {
   return 'content of filtered file'
 
-  //You can return an array, when you need to create more than one file,
-  //or to set special path of a file.
+  // You can return an array, when you need to create more than one file,
+  // or to set special path of a file.
   return [
     {
       path: 'path/of/new/file',
@@ -54,7 +54,7 @@ Type: `object`
 
 ####files
 
-Type: `array<string>`
+Type: `array.<string>`
 <br>
 Default: `['**']`
 
@@ -77,7 +77,7 @@ When this function is specified, option `targetExtension` doesn't work.
 
 ###Filter.processFileContent(content, relPath, srcDir)
 
-Returns: `string|array<object>`
+Returns: `string|array.<object>`
 
 This method must be implemented in the inherited class.
 It processes content of each file from the `inputTree` that matches patterns
