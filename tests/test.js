@@ -33,7 +33,7 @@ describe('Filter', function() {
 		fs.removeSync(DIR)
 	})
 
-	it('throws when processFileContent is not implemented', function(done) {
+	it('throws when "processFileContent" is not implemented', function(done) {
 		var CustomFilter = createCustomFilter()
 		var tree = new CustomFilter(DIR)
 		builder = new broccoli.Builder(tree)
@@ -42,7 +42,7 @@ describe('Filter', function() {
 			.catch(function() { done() })
 	})
 
-	it('calls processFileContent', function() {
+	it('calls "processFileContent"', function() {
 		var CustomFilter = createCustomFilter()
 		var spy = CustomFilter.prototype.processFileContent = sinon.spy()
 		var tree = new CustomFilter(ONE_FILE_DIR)
@@ -69,14 +69,29 @@ describe('Filter', function() {
 		})
 	})
 
-	it('uses targetExtension', function() {
+	it('uses "targetExtension"', function() {
 		var CustomFilter = createCustomFilter()
-		CustomFilter.prototype.processFileContent = function() { return  FILTERED}
+		CustomFilter.prototype.processFileContent = function() { return  FILTERED }
 		var tree = new CustomFilter(ONE_FILE_DIR, {targetExtension: 'ext'})
 		builder = new broccoli.Builder(tree)
 		return builder.build().then(function(result) {
 			var dir = result.directory
 			var content = fs.readFileSync(path.join(dir, 'file.ext'), 'utf-8')
+			assert.equal(content, FILTERED)
+		})
+	})
+
+	it('uses "changeFileName"', function() {
+		var CustomFilter = createCustomFilter()
+		CustomFilter.prototype.processFileContent = function() { return  FILTERED }
+		var tree = new CustomFilter(ONE_FILE_DIR, {
+			targetExtension: 'ext',
+			changeFileName: function(name) { return name + '.changed' }
+		})
+		builder = new broccoli.Builder(tree)
+		return builder.build().then(function(result) {
+			var dir = result.directory
+			var content = fs.readFileSync(path.join(dir, 'file.js.changed'), 'utf-8')
 			assert.equal(content, FILTERED)
 		})
 	})

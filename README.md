@@ -64,7 +64,16 @@ Glob patterns for filtered files.
 
 Type: `string`
 
-New extension for filtered files.
+New extension of filtered files.
+
+####changeFileName
+
+Type: `function(string) -> string`
+
+Function that is called for every file with its filename and should
+return new filename of the filtered file.
+<br>
+When this function is specified, option `targetExtension` doesn't work.
 
 ###Filter.processFileContent(content, relPath, srcDir)
 

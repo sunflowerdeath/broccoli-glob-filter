@@ -18,7 +18,7 @@ var Filter = function(inputTree, options) {
 	quickTemp.makeOrRemake(this, 'cacheDir')
 }
 
-//Calls processFile for each file matching 'options.files'
+/** Calls processFile for each file matching 'options.files'. */
 Filter.prototype.read = function(readTree) {
 	quickTemp.makeOrRemake(this, 'destDir')
 	var _this = this
@@ -31,9 +31,11 @@ Filter.prototype.read = function(readTree) {
 	})
 }
 
-//Compares file's hash and cached hash, and if they are different,
-//calls `processFilesContent` and writes result to `cacheDir`.
-//Then it copies files from `cacheDir` to `destDir`.
+/**
+ * Compares file's hash and cached hash, and if they are different,
+ * calls 'processFilesContent' and writes result to 'cacheDir'.
+ * Then it copies result from 'cacheDir' to 'destDir'.
+ */
 Filter.prototype.processFile = function(relPath, srcDir) {
 	var _this = this
 	var cacheEntry = this.cache[relPath]
@@ -52,9 +54,11 @@ Filter.prototype.processFile = function(relPath, srcDir) {
 	return promise.then(this.copyFromCache.bind(this))
 }
 
-//Saves result of `processFileContent` to `cacheDir`.
-//Result can be an array of file objects with paths and contents of new files,
-//or a string with content of new file.
+/**
+ * Saves result of 'processFileContent' to the 'cacheDir'.
+ * Result can be an array of file objects with paths and contents of new files,
+ * or a string with content of new file.
+ */
 Filter.prototype.saveToCache = function(result, file, hash) {
 	if (typeof result === 'string') {
 		result = [{
@@ -75,14 +79,19 @@ Filter.prototype.saveToCache = function(result, file, hash) {
 	return cacheEntry
 }
 
-//Path of file is original path with extension from `options.targetExtension`
+/**
+ * Makes path of filtered file.
+ * New path is original path with extension from 'options.targetExtension'.
+ */
 Filter.prototype.getDestFilePath = function(file) {
-	if (this.options.targetExtension) {
-		var basename = path.basename(file, path.extname(file)) + '.' +
+	var name = path.basename(file)
+	if (this.options.changeFileName) {
+		name = this.options.changeFileName(name)
+	} else if (this.options.targetExtension) {
+		name = path.basename(name, path.extname(name)) + '.' +
 			this.options.targetExtension
-		file = path.join(path.dirname(file), basename)
 	}
-	return file
+	return path.join(path.dirname(file), name)
 }
 
 Filter.prototype.hashFile = function(file) {
@@ -90,7 +99,7 @@ Filter.prototype.hashFile = function(file) {
 	return String(stats.mtime.getTime()) + String(stats.size)
 }
 
-//Copies files from `cacheDir` to `destDir`.
+/** Copies files from 'cacheDir' to 'destDir'. */
 Filter.prototype.copyFromCache = function(cacheEntry) {
 	_.each(cacheEntry.outputFiles, function(file) {
 		var src = path.join(this.cacheDir, file)
