@@ -38,7 +38,7 @@ MyFilter.processFileContent = function(content, relPath, srcDir) {
 
 ##API
 
-###Filter(inputTree, options)
+###Filter(inputTree, [options])
 
 Constructor.
 
