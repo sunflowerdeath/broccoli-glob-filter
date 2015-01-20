@@ -31,6 +31,10 @@ Filter.prototype.read = function(readTree) {
 	})
 }
 
+Filter.prototype.invalidateCache = function() {
+	this.cache = {}
+}
+
 /**
  * Compares file's hash and cached hash, and if they are different,
  * calls 'processFilesContent' and writes result to 'cacheDir'.
