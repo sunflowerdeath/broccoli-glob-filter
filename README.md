@@ -1,4 +1,4 @@
-#broccoli-glob-filter
+# broccoli-glob-filter
 
 Base class for broccoli plugins that processes files one by one.
 
@@ -7,13 +7,13 @@ Features:
 * It stores results in the cache and rebuilds only changed files.
 * It supports glob patterns to specify files to filter.
 
-##Install
+## Install
 
 ```
 npm install broccoli-glob-filter
 ```
 
-##Usage
+## Usage
 
 ```js
 var Filter = require('broccoli-glob-filter')
@@ -36,23 +36,23 @@ MyFilter.processFileContent = function(content, relPath, srcDir) {
 }
 ```
 
-##API
+## API
 
-###Filter(inputTree, [options])
+### Filter(inputTree, [options])
 
 Constructor.
 
-####inputTree
+#### inputTree
 
 Type: `Tree`
 
-####options
+#### options
 
 Type: `object`
 
-###List of options
+### List of options
 
-####files
+#### files
 
 Type: `array.<string>`
 <br>
@@ -60,13 +60,13 @@ Default: `['**']`
 
 Glob patterns for filtered files.
 
-####targetExtension
+#### targetExtension
 
 Type: `string`
 
 New extension of filtered files.
 
-####changeFileName
+#### changeFileName
 
 Type: `function(string) -> string`
 
@@ -75,7 +75,7 @@ return new filename of the filtered file.
 <br>
 When this function is specified, option `targetExtension` doesn't work.
 
-###Filter.processFileContent(content, relPath, srcDir)
+### Filter.processFileContent(content, relPath, srcDir)
 
 Returns: `string|array.<object>`
 
@@ -90,26 +90,26 @@ you can return an array of file objects with the following properties:
 
 If you want to process a file asynchronously, you can return a promise.
 
-####content
+#### content
 
 Type: `string`
 
 Content of source file.
 
-####relPath
+#### relPath
 
 Type: `string`
 
 Relative path of source file.
 
-####srcDir
+#### srcDir
 
 Type: `string`
 
 Path of the `inputTree`.
 You can use it, when you need to read additional files from tree.
 
-##License
+## License
 
 Public domain, see the `LICENCE.md` file.
 

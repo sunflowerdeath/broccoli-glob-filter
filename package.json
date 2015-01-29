@@ -1,6 +1,6 @@
 {
   "name": "broccoli-glob-filter",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Base class for broccoli plugins that processes files one by one.",
   "main": "index.js",
   "scripts": {
