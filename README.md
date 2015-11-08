@@ -22,7 +22,7 @@ var MyFilter = function(inputTree, options) {
   Filter.apply(this, arguments)
 }
 MyFilter.prototype = Object.create(Filter.prototype)
-MyFilter.processFileContent = function(content, relPath, srcDir) {
+MyFilter.prototype.processFileContent = function(content, relPath, srcDir) {
   return 'content of filtered file'
 
   // You can return an array, when you need to create more than one file,
